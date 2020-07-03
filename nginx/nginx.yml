@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+
+data:
+  nginx.conf: |
+    server {
+      listen 80;
+      index index.php index.html;
+      root /usr/share/nginx/html;
+    }
+  index.html: |
+    <html><body><h1>Code.education Rocks!</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-nginx  
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-nginx
+  template:
+    metadata:
+      labels:
+        app: hello-nginx
+    spec:
+      containers:
+
+      - name: nginx
+        image: nginx:1.17-alpine
+
+        ports: 
+        - name: http
+          containerPort: 80
+
+        volumeMounts:
+
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-conf
+          readOnly: true
+
+        - mountPath: /usr/share/nginx/html
+          name: nginx-root
+          readOnly: true
+      
+      volumes:
+
+      - name: nginx-conf
+
+        configMap:
+          name: nginx-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+
+      - name: nginx-root
+
+        configMap:
+          name: nginx-conf
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector: 
+    app: hello-nginx
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
