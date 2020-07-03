@@ -21,7 +21,6 @@ FROM alpine:latest
 
 COPY --chown=0:0 --from=builder /dist/fakewebserver /fakewebserver
 
-# Expõe o port TCP 8000
 EXPOSE 8000
 
 ENTRYPOINT ["/fakewebserver"]
