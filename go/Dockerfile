@@ -16,7 +16,7 @@ RUN go build fakewebserver.go
 WORKDIR /dist
 RUN cp /build/fakewebserver ./fakewebserver
 
-# Cria a imagem mínima para runtime, baseado na imagem raiz
+# Cria a imagem mínima para runtime, baseado na imagem raiz 
 FROM alpine:latest
 
 COPY --chown=0:0 --from=builder /dist/fakewebserver /fakewebserver
